@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Hello World</title>
+    
+        <style>
+            table, th, td {
+                border: 1px solid red;
+                border-collapse: collapse;
+            }
+    
+            .testClass{
+        
+                background-color: blue;
+        
+            }
+        </style>
+    
+        <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+        <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+        <script type="text/babel">
+        
+            var headers = ["Car", "Monkey", "Ball", "Stuff"];
+            var rows = ["1", "2", "3", "4", "5"];
+            var data = {}
+
+            data["1"] = {"Car": {text: "vw", css:""}, "Monkey": {text: "Mandrill", css:""}, "Ball": {text: "", css:""}, "Stuff": {text: "", css:""}};
+            data["2"] = {"Car": {text: "vw", css:""}, "Monkey": {text: "Mandrill", css:""}, "Ball": {text: "", css:""}, "Stuff": {text: "", css:""}};
+            data["3"] = {"Car": {text: "vw", css:""}, "Monkey": {text: "Mandrill", css:""}, "Ball": {text: "", css:""}, "Stuff": {text: "", css:""}};
+            data["4"] = {"Car": {text: "vw", css:""}, "Monkey": {text: "Mandrill", css:""}, "Ball": {text: "", css:""}, "Stuff": {text: "", css:""}};
+            data["5"] = {"Car": {text: "vw", css:""}, "Monkey": {text: "Mandrill", css:""}, "Ball": {text: "", css:""}, "Stuff": {text: "", css:""}};
+        
+        // ========================================
+        // The following classes build the header
+        // ========================================
+
+           /**
+            * HeaderCell is a header cell.
+            *
+            * @param header is the header text
+            */
+            class HeaderCell extends React.Component {
+    
+                render() {
+                    return (
+                        <th id={this.props.header}>{this.props.header}</th>
+                    );
+                }
+            }
+
+           /**
+            * TableCell creates a cell in the table
+            *
+            * @param headers is the list of headers
+            */
+            class TableHeader extends React.Component{
+
+                render() {
+    
+                    var header_rows = [];
+
+                    this.props.headers.forEach(function(header) {
+                        header_rows.push(<HeaderCell header={header} key={header} />);
+                });
+        
+                return (
+                    <thead>
+                        <tr>
+                                {header_rows}
+                            </tr>
+                        </thead>
+                    );
+                }
+            }
+
+        // =======================================
+        // The following classes build the table
+        // =======================================
+
+           /**
+            * TableCell creates a cell in the table
+            *
+            * @param data is the data and css class for the cell
+            * @param id is the id of the cell
+            */
+            class TableCell extends React.Component{
+
+                render() {
+                    return (
+                        <td className={this.props.data.css} id={this.props.id}>{this.props.data.text}</td>
+                    );
+                }
+            }
+
+           /**
+            * TableRow builds a row in the table.
+            *
+            * @param data is the data structure with the cell data in it
+            * @param headers is the list of headers for creating unique ids
+            * @param row is the name of the row
+            */
+            class TableRow extends React.Component {
+
+                render() {
+    
+                var cells = [];
+        
+                    for(var i = 0; i < this.props.headers.length; i++){
+                        let id_key = this.props.row + '_' + this.props.headers[i];
+                        cells.push(<TableCell  id={id_key} data={this.props.data[this.props.headers[i]]} key={id_key}/>);
+                    }
+    
+                    return (
+                        <tr>
+                            {cells}
+                        </tr>
+             
+                    );
+                }
+            }
+    
+           /**
+            * TableBody builds the body of the table
+            *
+            * @param data is the data structure with the cell data in it
+            * @param headers is the list of headers for creating unique ids
+            * @param rows is the list of rows
+            */
+            class TableBody extends React.Component{
+    
+                render(){
+    
+                    var data_rows = [];
+        
+                    for(var i = 0; i < this.props.rows.length; i++) {
+                        data_rows.push(<TableRow row={this.props.rows[i]} headers={this.props.headers} data={this.props.data[this.props.rows[i]]} key={this.props.rows[i]} />);
+                    }
+        
+                    return(
+                        <tbody>
+                            {data_rows}
+                        </tbody>
+                    );
+        
+                }
+    
+            }
+
+            // =============================================
+            // The following class builds the entire table
+            // =============================================
+
+           /**
+            * DynamicTable builds the dynamic table
+            *
+            * @param data is the data structure with the cell data in it
+            * @param headers is the list of headers for creating unique ids
+            * @param rows is the list of rows
+            */
+            class DynamicTable extends React.Component {
+  
+                render() {
+        
+                    return (
+                        <table>
+                            <TableHeader headers={this.props.headers} />
+                            <TableBody rows={this.props.rows} headers={this.props.headers} data={this.props.data} />
+                        </table>
+                    );
+                }
+            }
+    
+           /**
+            * renderTable renders the table
+            */
+            function renderTable(){
+
+                ReactDOM.render(
+                    <DynamicTable rows={rows} headers={headers} data={data} />,
+                    document.getElementById("container")
+                );
+
+            }
+
+           /**
+            * updateCellData updates individual cell data
+            *
+            * @param row is the row the cell is in
+            * @param header is the column the cell is in
+            * @param cell_class is the style class of the cell
+            * @param cell_text is the text for the cell
+            */
+            function updateCellData(row, header, cell_class, cell_text){
+
+                data[row][header].css = cell_class;
+                data[row][header].text = cell_text;
+
+            }
+
+            /**
+             * onload runs a test of my REACT JS table builder
+             */
+            function onload(){
+        
+                renderTable();
+
+                setTimeout(function(){
+
+                    updateCellData("3", "Stuff", "testClass", "UPDATED");
+                    updateCellData("1", "Car", "testClass", "NEW CAR");
+
+                }, 3000);
+            
+                setTimeout(function(){
+                    renderTable();
+                }, 8000);
+            
+            }
+    
+        </script>
+    </head>
+    <body onload="onload();" bgcolor="#0000">
+        <div id="container" style="color:white">
+            <!-- This element's contents will be replaced with your component. -->
+        </div>
+    </body>
+</html>
+
